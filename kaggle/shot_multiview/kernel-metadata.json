@@ -1,0 +1,17 @@
+{
+ "id": "hashulearn/padel-shot-multiview",
+ "title": "padel-shot-multiview",
+ "code_file": "train.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": "true",
+ "enable_gpu": "false",
+ "enable_tpu": "false",
+ "enable_internet": "true",
+ "dataset_sources": [
+  "hashulearn/padel-coach-data"
+ ],
+ "competition_sources": [],
+ "kernel_sources": [],
+ "model_sources": []
+}

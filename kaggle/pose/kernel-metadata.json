@@ -1,0 +1,18 @@
+{
+ "id": "hashuu7/padel-coach-train-pose-shot",
+ "title": "padel-coach-train-pose-shot",
+ "code_file": "train.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": "true",
+ "enable_gpu": "true",
+ "enable_tpu": "false",
+ "enable_internet": "true",
+ "dataset_sources": [
+  "hashuu7/padel-coach-data"
+ ],
+ "competition_sources": [],
+ "kernel_sources": [],
+ "model_sources": [],
+ "machine_shape": "NvidiaTeslaT4"
+}

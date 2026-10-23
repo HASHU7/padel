@@ -1,0 +1,72 @@
+{
+ "source": [
+  "2022_BCN_FinalF_1",
+  "2022_BCN_FinalM_1"
+ ],
+ "level": "WPT Master Final (pro)",
+ "by_type": {
+  "lob": {
+   "error_rate": 0.1595,
+   "n": 326
+  },
+  "vibora": {
+   "error_rate": 0.0392,
+   "n": 153
+  },
+  "smash": {
+   "error_rate": 0.0106,
+   "n": 94
+  },
+  "backhand_drive": {
+   "error_rate": 0.0889,
+   "n": 90
+  },
+  "backhand_volley": {
+   "error_rate": 0.0833,
+   "n": 120
+  },
+  "return": {
+   "error_rate": 0.0909,
+   "n": 99
+  },
+  "bandeja": {
+   "error_rate": 0.1311,
+   "n": 122
+  },
+  "forehand_drive": {
+   "error_rate": 0.0485,
+   "n": 103
+  },
+  "forehand_volley": {
+   "error_rate": 0.0826,
+   "n": 121
+  },
+  "serve": {
+   "error_rate": 0.0192,
+   "n": 104
+  },
+  "dropshot": {
+   "error_rate": 0.3333,
+   "n": 3
+  },
+  "backhand_wall": {
+   "error_rate": 0.1667,
+   "n": 6
+  },
+  "forehand_wall": {
+   "error_rate": 0.0,
+   "n": 4
+  }
+ },
+ "position": {
+  "transition_time_pct": 19.35,
+  "net_time_pct": 39.95,
+  "points_won_after_lob_pct": 56.85
+ },
+ "biomech": {
+  "knee_flexion_low_balls_deg": 120.7
+ },
+ "pair": {
+  "split_pct": 16.4
+ }
+}

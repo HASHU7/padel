@@ -1,0 +1,20 @@
+{
+ "id": "hashulearn/padel-cv-eval",
+ "title": "padel-cv-eval",
+ "code_file": "train.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": "true",
+ "enable_gpu": "false",
+ "enable_tpu": "false",
+ "enable_internet": "true",
+ "dataset_sources": [
+  "hashulearn/padel-coach-data",
+  "hashulearn/padel-cv-detections"
+ ],
+ "competition_sources": [],
+ "kernel_sources": [
+  "hashulearn/padel-cv-shot"
+ ],
+ "model_sources": []
+}

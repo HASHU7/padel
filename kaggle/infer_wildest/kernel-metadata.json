@@ -1,0 +1,20 @@
+{
+ "id": "hashulearn/padel-infer-wildest",
+ "title": "padel-infer-wildest",
+ "code_file": "infer_wildest.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": "true",
+ "enable_gpu": "true",
+ "enable_tpu": "false",
+ "enable_internet": "true",
+ "dataset_sources": [
+  "hashulearn/padel-coach-models",
+  "hashulearn/padel-coach-data",
+  "hashulearn/padel-wildest-match"
+ ],
+ "competition_sources": [],
+ "kernel_sources": [],
+ "model_sources": [],
+ "machine_shape": "NvidiaTeslaT4"
+}

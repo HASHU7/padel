@@ -1,0 +1,37 @@
+{
+  "image_points": {
+    "near_service_center": [
+      75.0,
+      675.0
+    ],
+    "net_center": [
+      580.0,
+      510.0
+    ],
+    "far_service_center": [
+      840.0,
+      425.0
+    ],
+    "net_left": [
+      210.0,
+      560.0
+    ],
+    "far_service_left": [
+      520.0,
+      440.0
+    ],
+    "far_service_right": [
+      1080.0,
+      410.0
+    ]
+  },
+  "width": 1280,
+  "height": 720,
+  "scoreboard_roi": [
+    10,
+    10,
+    240,
+    130
+  ],
+  "reprojection_error_m": 0.5628
+}

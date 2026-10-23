@@ -1,0 +1,62 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Heavy video files (>25MB - multi-GB files)
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Heavy datasets and annotation JSONs (>100MB exceeds GitHub push limits)
+labels/*.json
+labels/cache/
+*.pkl
+*.npz
+models/*.onnx
+kaggle_upload/
+kaggle_outputs/
+kaggle_cvdet_upload/
+kaggle_models_upload/
+colab_bundle/*.zip
+colab_bundle/padel_bundle/
+
+# Workspace debug crops, generated runs and cache
+workspace/videos/
+workspace/detections/
+workspace/kaggle_infer_*
+workspace/results/
+workspace/*.jpg
+workspace/*.png
+workspace/*.txt
+*.jpg
+*.png
+
+# Tool and test artifacts
+sharppcap-master/
+.pytest_cache/
+.playwright-mcp/
+*.log
+.DS_Store
+Thumbs.db

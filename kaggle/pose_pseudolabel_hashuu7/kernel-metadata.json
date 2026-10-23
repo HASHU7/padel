@@ -1,0 +1,21 @@
+{
+ "id": "hashuu7/padel-pose-pseudolabel",
+ "title": "padel-pose-pseudolabel",
+ "code_file": "train.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": "true",
+ "enable_gpu": "true",
+ "enable_tpu": "false",
+ "enable_internet": "true",
+ "dataset_sources": [
+  "hashuu7/padel-coach-data",
+  "ichimarugin/padel-ball-dataset"
+ ],
+ "competition_sources": [],
+ "kernel_sources": [
+  "hashuu7/padel-coach-train-pose-shot"
+ ],
+ "model_sources": [],
+ "machine_shape": "NvidiaTeslaT4"
+}

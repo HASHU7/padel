@@ -1,0 +1,18 @@
+{
+ "classes": [
+  "Serve",
+  "Forehand",
+  "Backhand",
+  "Smash",
+  "Dropshot",
+  "Other"
+ ],
+ "window": 31,
+ "training": "Barcelona finals (PadelTracker100) + 50% of josmazna/padelpose, ball-feature dropout 0.5",
+ "unseen_broadcast_match_accuracy": {
+  "train_women_test_men": 0.7827,
+  "train_men_test_women": 0.8373
+ },
+ "padelpose_heldout_accuracy": 0.9933,
+ "note": "padelpose held-out half is from the same recording session (near-duplicates); it does not prove generalisation to new camera setups. Barcelona-only + dropout scored 0.49-0.63 on it."
+}
