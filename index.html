@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎾 Padel AI Coach - Complete Professional Match, Technique & Foul Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(0, 215, 255, 0.22);
+      --accent-cyan: #00d7ff;
+      --accent-green: #00ff88;
+      --accent-orange: #ff9900;
+      --accent-red: #ff3366;
+      --accent-purple: #b388ff;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      padding: 20px;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 215, 255, 0.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+    .title-group h1 {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00d7ff, #00ff88);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.5px;
+    }
+    .title-group p {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      padding: 8px 18px;
+      border-radius: 30px;
+    }
+    .score-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--accent-green);
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+
+    /* Top Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      background: rgba(0, 215, 255, 0.1);
+      border-color: rgba(0, 215, 255, 0.4);
+      color: var(--text-main);
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 215, 255, 0.2), rgba(0, 255, 136, 0.2));
+      border-color: var(--accent-cyan);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(0, 215, 255, 0.25);
+    }
+    .tab-badge {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tab-badge.red { background: rgba(255, 51, 102, 0.2); color: var(--accent-red); border: 1px solid rgba(255, 51, 102, 0.4); }
+    .tab-badge.green { background: rgba(0, 255, 136, 0.2); color: var(--accent-green); border: 1px solid rgba(0, 255, 136, 0.4); }
+
+    /* Main Grid Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.15fr;
+      gap: 20px;
+    }
+    @media (max-width: 1200px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Left Pane */
+    .left-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .video-card {
+      background: #000;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+      max-height: 480px;
+      object-fit: contain;
+      background: #05070d;
+    }
+
+    /* Video Overlay Bar */
+    .video-hud-overlay {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(10, 15, 25, 0.88);
+      border: 1px solid rgba(0, 215, 255, 0.4);
+      border-radius: 8px;
+      padding: 8px 14px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .hud-shot-badge {
+      background: var(--accent-green);
+      color: #000;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .foul-hud-banner {
+      position: absolute;
+      bottom: 60px;
+      left: 14px;
+      right: 14px;
+      background: rgba(255, 51, 102, 0.92);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 20px rgba(255, 51, 102, 0.6);
+      animation: flash 1s infinite alternate;
+    }
+    @keyframes flash { from { opacity: 0.85; } to { opacity: 1; } }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 18px;
+      backdrop-filter: blur(14px);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 10px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Coach Speech Bubble */
+    .coach-feedback-box {
+      background: linear-gradient(135deg, rgba(0, 215, 255, 0.08), rgba(0, 255, 136, 0.06));
+      border: 1px solid rgba(0, 215, 255, 0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 12px;
+      position: relative;
+    }
+    .coach-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 215, 255, 0.2);
+      color: var(--accent-cyan);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .coach-text {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #e2e8f0;
+    }
+    .coach-cue {
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: var(--accent-green);
+      font-weight: 600;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    /* Metric Gauges Grid */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    @media (max-width: 600px) {
+      .telemetry-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .t-gauge {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .t-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .t-val {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+    }
+    .t-unit { font-size: 11px; font-weight: 400; color: var(--text-dim); }
+
+    /* Right Side Panel */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* 4 Players Quick Switcher */
+    .player-selector-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .p-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .p-btn:hover { background: rgba(0, 215, 255, 0.15); color: #fff; }
+    .p-btn.active {
+      background: rgba(0, 255, 136, 0.18);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+    }
+
+    /* Player Profile Detailed View */
+    .radar-stats-box {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+    }
+    .stat-bar-outer {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      margin: 0 12px;
+      overflow: hidden;
+    }
+    .stat-bar-inner {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+    }
+    .stat-bar-inner.red { background: linear-gradient(90deg, var(--accent-orange), var(--accent-red)); }
+
+    /* Assigned Drills Box */
+    .drill-card {
+      background: rgba(0, 255, 136, 0.06);
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 10px;
+      font-size: 12.5px;
+    }
+    .drill-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-green);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .drill-item { margin-top: 6px; color: var(--text-muted); line-height: 1.4; }
+    .drill-item strong { color: var(--text-main); }
+
+    /* Fouls Log Table / List */
+    .foul-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .foul-card {
+      background: rgba(255, 51, 102, 0.06);
+      border-left: 3px solid var(--accent-red);
+      border-radius: 6px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .foul-card:hover {
+      background: rgba(255, 51, 102, 0.16);
+      transform: translateX(3px);
+    }
+    .foul-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .foul-name {
+      font-weight: 700;
+      font-size: 13px;
+      color: #ff6b8b;
+    }
+    .foul-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-orange);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .foul-detail {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+    .foul-correction {
+      font-size: 11.5px;
+      color: var(--accent-green);
+      margin-top: 4px;
+    }
+
+    /* Shot List / Explorer */
+    .shot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 440px;
+      overflow-y: auto;
+    }
+    .shot-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-size: 12.5px;
+      transition: all 0.2s;
+    }
+    .shot-item:hover, .shot-item.active {
+      background: rgba(0, 215, 255, 0.12);
+      border-color: var(--accent-cyan);
+    }
+    .shot-cat-tag {
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .shot-cat-tag.Smash { background: rgba(255, 51, 102, 0.2); color: #ff3366; }
+    .shot-cat-tag.Forehand { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+    .shot-cat-tag.Backhand { background: rgba(0, 215, 255, 0.2); color: #00d7ff; }
+    .shot-cat-tag.Serve { background: rgba(255, 153, 0, 0.2); color: #ff9900; }
+    .shot-cat-tag.Other { background: rgba(179, 136, 255, 0.2); color: #b388ff; }
+    .shot-cat-tag.Dropshot { background: rgba(255, 220, 50, 0.2); color: #ffdc32; }
+
+    /* Filter Controls */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .filter-select {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      outline: none;
+    }
+
+    /* Point sequence chips */
+    .point-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .point-card:hover {
+      background: rgba(0, 215, 255, 0.08);
+      border-color: rgba(0, 215, 255, 0.3);
+    }
+    .point-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .point-outcome {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .point-outcome.WINNER { color: var(--accent-green); }
+    .point-outcome.ERROR { color: var(--accent-orange); }
+    .point-outcome.FOUL { color: var(--accent-red); }
+    .sequence-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .p-chip {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* 4-Week Development Plan */
+    .week-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--accent-cyan);
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .week-title {
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="title-group">
+      <h1>🎾 Padel AI Coach — Match, Biomechanics & Foul Intelligence</h1>
+      <p>World Padel Tour Finals • Automated 17-Keypoint Biomechanics, Tactical Auditing & Certified FIP Rules Engine</p>
+    </div>
+    <div class="score-badge">
+      <div class="live-dot"></div>
+      <span class="score-val" id="matchScoreDisplay">Set 1: 1 - 4 (Game 6)</span>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('hud')">
+      🎥 Live Video & Telemetry HUD
+    </button>
+    <button class="tab-btn" onclick="switchTab('fouls')">
+      ⚠️ FIP Fouls & Infractions
+      <span class="tab-badge red" id="foulCountBadge">72 Detected</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('shots')">
+      ⚡ All Shots Explorer
+      <span class="tab-badge green" id="shotsCountBadge">460 Shots</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('points')">
+      🏆 Game & Point Flow
+      <span class="tab-badge" id="pointsCountBadge">34 Rallies</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('player-dev')">
+      👥 4-Player Coaching & Drills
+    </button>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="main-grid">
+
+    <!-- Left Pane: Dynamic Content depending on Tab -->
+    <div class="left-pane">
+      
+      <!-- Video Container (Always available at top or in HUD mode) -->
+      <div class="video-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(15,23,42,0.92); border-bottom:1px solid var(--border-color); font-size:12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="color:var(--accent-cyan); font-weight:700; letter-spacing:0.5px;">📺 VIDEO STREAM:</span>
+            <select id="videoSourceSelect" onchange="changeVideoSource(this.value)" style="background:var(--bg-card); color:var(--text-main); border:1px solid var(--border-color); padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; outline:none;">
+              <option value="2022_BCN_FinalF_1.mp4" selected>Full Match Broadcast (25.5 min • All 32 Points & 450 Shots)</option>
+              <option value="models/padel_live_match_coach.mp4">AI HUD Telemetry Sample (13.5s Rendered Clip)</option>
+            </select>
+          </div>
+          <span id="videoStatusBadge" style="font-family:'JetBrains Mono',monospace; color:var(--accent-green); font-size:11.5px; background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.3); padding:3px 8px; border-radius:4px;">
+            ⚡ HTTP 206 Byte-Range Seeking Active
+          </span>
+        </div>
+        <video id="padelVid" controls autoplay loop muted playsinline style="width:100%; border-radius:0 0 12px 12px; background:#000;">
+          <source src="2022_BCN_FinalF_1.mp4" type="video/mp4">
+          <source src="models/padel_live_match_coach.mp4" type="video/mp4">
+          Your browser does not support HTML5 MP4 video.
+        </video>
+
+        <!-- Live Overlay Badge -->
+        <div class="video-hud-overlay">
+          <span class="hud-shot-badge" id="overlayShotCat">ACTIVE RALLY</span>
+          <span id="overlayShooter">Shooter: Tracking</span>
+          <span id="overlaySpeed" style="color:var(--accent-green)">Speed: -- km/h</span>
+        </div>
+
+        <!-- Foul Warning Banner -->
+        <div class="foul-hud-banner" id="overlayFoulBanner">
+          <span>⚠️ FOUL DETECTED:</span>
+          <span id="overlayFoulText">Service Foot Fault (FIP Rule 6)</span>
+        </div>
+      </div>
+
+      <!-- TAB 1: Live Video HUD Telemetry -->
+      <div id="tabContentHud">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚡ Real-Time Shot Biomechanics & Kinematics</span>
+            <span style="font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--accent-green)" id="liveFrameDisplay">Frame: 0000 | 30.0 FPS</span>
+          </div>
+
+          <div class="telemetry-grid">
+            <div class="t-gauge">
+              <div class="t-label">Ball Exit Speed</div>
+              <div class="t-val" id="teleSpeed">88.5 <span class="t-unit">km/h</span></div>
+            </div>
+            <div class="t-gauge">
+              <div class="t-label">Knee Flexion</div>
+              <div class="t-val" id="teleKnee">138.2<span class="t-unit">°</span></div>
+            </div>
+            <div class="t-gauge">
+              <div class="t-label">Contact Timing</div>
+              <div class="t-val" id="teleContact">+22 <span class="t-unit">cm</span></div>
+            </div>
+            <div class="t-gauge">
+              <div class="t-label">Technique Score</div>
+              <div class="t-val" id="teleScore" style="color:var(--accent-green)">88 <span class="t-unit">/100</span></div>
+            </div>
+          </div>
+
+          <!-- Coach Feedback Speech Bubble -->
+          <div class="coach-feedback-box">
+            <div class="coach-badge">🎾 AI COACH OBSERVATION</div>
+            <div class="coach-text" id="coachLiveSpeech">
+              "Great forward contact point in front of lead hip with balanced weight transfer. Arm extension at 12 o'clock provides steep downward clearance."
+            </div>
+            <div class="coach-cue" id="coachLiveCue">
+              <span>🎯 <strong>Coaching Cue:</strong> Maintain unit turn coil early before the ball crosses net plane.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: FIP Fouls & Infraction Center -->
+      <div id="tabContentFouls" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚠️ Official FIP Rule Violations & Fouls Log</span>
+            <div class="filter-bar" style="margin-bottom:0">
+              <select class="filter-select" id="foulFilterSelect" onchange="filterFouls()">
+                <option value="ALL">All Rule Violations (72)</option>
+                <option value="SERVICE_FOOT_FAULT">Service Foot Faults (22)</option>
+                <option value="SERVICE_WAIST_HEIGHT_FAULT">Waist-Height Serves (16)</option>
+                <option value="DIRECT_WALL_OUT_FAULT">Direct Glass Outs (16)</option>
+                <option value="DOUBLE_BOUNCE_FAULT">Double Bounces (10)</option>
+                <option value="NET_TOUCH_INVASION_FAULT">Net Touches / Invasions (8)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="foul-list" id="foulCardsContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: All Shots Explorer -->
+      <div id="tabContentShots" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚡ Match Shot-by-Shot Explorer (460 Shots)</span>
+            <div class="filter-bar" style="margin-bottom:0">
+              <select class="filter-select" id="shotCategoryFilter" onchange="filterShots()">
+                <option value="ALL">All Shot Types</option>
+                <option value="Forehand">Forehand Drives & Volleys</option>
+                <option value="Backhand">Backhand Drives & Volleys</option>
+                <option value="Smash">Smashes & Bandejas</option>
+                <option value="Serve">Serves</option>
+                <option value="Dropshot">Dropshots / Chiquitas</option>
+              </select>
+              <select class="filter-select" id="shotPlayerFilter" onchange="filterShots()">
+                <option value="ALL">All Players</option>
+                <option value="0">P0 (Near Left)</option>
+                <option value="1">P1 (Far Left)</option>
+                <option value="2">P2 (Far Right)</option>
+                <option value="3">P3 (Near Right)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="shot-list" id="shotListContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Game & Point Flow -->
+      <div id="tabContentPoints" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🏆 Match Game & Rally Progression (34 Points)</span>
+            <span style="font-size:12px; color:var(--accent-cyan)">Click any rally to seek video</span>
+          </div>
+
+          <div id="pointsListContainer" style="max-height:480px; overflow-y:auto;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: Player Development & Drills -->
+      <div id="tabContentPlayerDev" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">👥 Individual Player Diagnostics & Improvement Programs</span>
+          </div>
+
+          <div class="player-selector-row">
+            <div class="p-btn active" onclick="selectPlayer(0)">P0 (Near Left)</div>
+            <div class="p-btn" onclick="selectPlayer(1)">P1 (Far Left)</div>
+            <div class="p-btn" onclick="selectPlayer(2)">P2 (Far Right)</div>
+            <div class="p-btn" onclick="selectPlayer(3)">P3 (Near Right)</div>
+          </div>
+
+          <div id="playerDossierContent">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Side Panel: Persistent Tactical Telemetry & Coach Summary -->
+    <div class="side-panel">
+      
+      <!-- Player Radar Summary -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">👥 4-Player Court Audit</span>
+          <span style="font-size:12px; color:var(--text-muted)" id="sidePlayerTitle">Player 0 (Near Left)</span>
+        </div>
+
+        <div class="player-selector-row">
+          <div class="p-btn active" id="sideBtnP0" onclick="selectPlayer(0)">P0</div>
+          <div class="p-btn" id="sideBtnP1" onclick="selectPlayer(1)">P1</div>
+          <div class="p-btn" id="sideBtnP2" onclick="selectPlayer(2)">P2</div>
+          <div class="p-btn" id="sideBtnP3" onclick="selectPlayer(3)">P3</div>
+        </div>
+
+        <div class="radar-stats-box" id="sideRadarBox">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Assigned Drill Card -->
+        <div class="drill-card" id="sideDrillCard">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Tactical Court Zone Telemetry -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📍 Tactical Zone Discipline</span>
+        </div>
+        <div style="font-size:13px; color:var(--text-muted); line-height:1.6;" id="sideZoneStats">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Load match data bundle safely -->
+  <script src="match_data.js"></script>
+  <script>
+    // Global State
+    let matchData = null;
+    let currentShotsList = [];
+    let currentFoulsList = [];
+    let selectedPlayerId = 0;
+
+    // Initialize application
+    async function initApp() {
+      // Priority 1: Check window.MATCH_DATA loaded by match_data.js
+      if (window.MATCH_DATA) {
+        matchData = window.MATCH_DATA;
+        setupUI();
+        return;
+      }
+
+      // Priority 2: Fallback to fetch if running on http server
+      try {
+        const resp = await fetch('reports/complete_match_coaching_results.json');
+        if (resp.ok) {
+          matchData = await resp.json();
+          setupUI();
+          return;
+        }
+      } catch (e) {
+        console.warn('Fetch fallback failed, using embedded demo data:', e);
+      }
+
+      // Priority 3: Fallback minimal demo data if neither available
+      matchData = getFallbackData();
+      setupUI();
+    }
+
+    function setupUI() {
+      if (!matchData) return;
+
+      const meta = matchData.match_meta || matchData.evaluation_summary || {};
+      const scoreText = meta.final_score || meta.final_match_score || "Set 1: 1 - 4";
+      document.getElementById('matchScoreDisplay').textContent = `${scoreText} (${meta.total_games || 6} Games)`;
+
+      currentShotsList = matchData.all_shots || [];
+      currentFoulsList = matchData.all_fouls || [];
+
+      document.getElementById('foulCountBadge').textContent = `${currentFoulsList.length} Detected`;
+      document.getElementById('shotsCountBadge').textContent = `${currentShotsList.length} Shots`;
+      document.getElementById('pointsCountBadge').textContent = `${(matchData.points || []).length} Rallies`;
+
+      renderFoulsList(currentFoulsList);
+      renderShotsList(currentShotsList);
+      renderPointsList(matchData.points || []);
+      selectPlayer(0);
+      setupVideoListener();
+    }
+
+    // Switch Top Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tabContentHud').style.display = 'none';
+      document.getElementById('tabContentFouls').style.display = 'none';
+      document.getElementById('tabContentShots').style.display = 'none';
+      document.getElementById('tabContentPoints').style.display = 'none';
+      document.getElementById('tabContentPlayerDev').style.display = 'none';
+
+      if (tabId === 'hud') {
+        document.getElementById('tabContentHud').style.display = 'block';
+        event.target.classList.add('active');
+      } else if (tabId === 'fouls') {
+        document.getElementById('tabContentFouls').style.display = 'block';
+        event.target.classList.add('active');
+      } else if (tabId === 'shots') {
+        document.getElementById('tabContentShots').style.display = 'block';
+        event.target.classList.add('active');
+      } else if (tabId === 'points') {
+        document.getElementById('tabContentPoints').style.display = 'block';
+        event.target.classList.add('active');
+      } else if (tabId === 'player-dev') {
+        document.getElementById('tabContentPlayerDev').style.display = 'block';
+        event.target.classList.add('active');
+        renderPlayerDossier(selectedPlayerId);
+      }
+    }
+
+    // Video Stream Switching & Seek Function
+    function changeVideoSource(src) {
+      const vid = document.getElementById('padelVid');
+      const badge = document.getElementById('videoStatusBadge');
+      const isPaused = vid.paused;
+      vid.src = src;
+      vid.load();
+      if (!isPaused) vid.play();
+      if (badge) {
+        if (src.includes('FinalF')) {
+          badge.textContent = "⚡ Full Match (25.5m) • HTTP 206 Seeking";
+          badge.style.color = "var(--accent-green)";
+        } else {
+          badge.textContent = "⚡ HUD Sample (13.5s) • Active";
+          badge.style.color = "var(--accent-cyan)";
+        }
+      }
+    }
+
+    function seekToTime(sec, title = "", cat = "") {
+      const vid = document.getElementById('padelVid');
+      const sel = document.getElementById('videoSourceSelect');
+
+      // If requested timestamp exceeds 13s and currently on sample video, auto-switch to full match video
+      const isSample = vid.currentSrc && vid.currentSrc.includes('padel_live_match_coach');
+      if (sec > 13.0 && (isSample || (sel && sel.value.includes('padel_live_match_coach')))) {
+        if (sel) sel.value = "2022_BCN_FinalF_1.mp4";
+        changeVideoSource("2022_BCN_FinalF_1.mp4");
+        vid.addEventListener('loadedmetadata', () => {
+          vid.currentTime = Math.max(0, sec);
+          vid.play().catch(e => console.warn('Autoplay prevented:', e));
+        }, { once: true });
+      } else {
+        vid.currentTime = Math.max(0, sec);
+        vid.play().catch(e => console.warn('Autoplay prevented:', e));
+      }
+
+      if (title) {
+        document.getElementById('overlayShooter').textContent = title;
+      }
+      if (cat) {
+        document.getElementById('overlayShotCat').textContent = cat.toUpperCase();
+      }
+    }
+
+    // Render Fouls List
+    function renderFoulsList(fouls) {
+      const container = document.getElementById('foulCardsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (fouls.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-muted); padding:20px; text-align:center;">No fouls match this filter.</div>';
+        return;
+      }
+
+      fouls.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'foul-card';
+        div.onclick = () => {
+          seekToTime(f.timestamp_sec, `⚠️ FOUL: ${f.foul_name}`, 'FOUL');
+          showFoulBanner(f);
+        };
+        div.innerHTML = `
+          <div class="foul-top">
+            <span class="foul-name">⚠️ ${f.foul_name}</span>
+            <span class="foul-tag">${f.timestamp_sec}s • ${f.offender_team} (P${f.offender_idx})</span>
+          </div>
+          <div class="foul-detail">
+            <strong>Rule:</strong> ${f.rule} — ${f.explanation}
+          </div>
+          <div class="foul-detail" style="color:#cbd5e1; margin-top:2px;">
+            <em>${f.metric_detail}</em>
+          </div>
+          <div class="foul-correction">
+            🎯 <strong>Coach Correction:</strong> ${f.coach_correction}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function filterFouls() {
+      const sel = document.getElementById('foulFilterSelect').value;
+      if (sel === 'ALL') {
+        renderFoulsList(currentFoulsList);
+      } else {
+        const filtered = currentFoulsList.filter(f => f.foul_type === sel);
+        renderFoulsList(filtered);
+      }
+    }
+
+    function showFoulBanner(f) {
+      const banner = document.getElementById('overlayFoulBanner');
+      document.getElementById('overlayFoulText').textContent = `${f.foul_name} (P${f.offender_idx}) — ${f.rule}`;
+      banner.style.display = 'flex';
+      setTimeout(() => { banner.style.display = 'none'; }, 4000);
+    }
+
+    // Render Shots List
+    function renderShotsList(shots) {
+      const container = document.getElementById('shotListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      shots.slice(0, 150).forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'shot-item';
+        div.onclick = () => {
+          seekToTime(s.timestamp_sec, `${s.shooter_name}`, s.category);
+          updateTelemetryWithShot(s);
+        };
+        div.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="shot-cat-tag ${s.category}">${s.category}</span>
+            <span><strong>${s.shooter_name}</strong></span>
+            <span style="color:var(--text-muted); font-size:11px;">${s.court_zone}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; font-family:'JetBrains Mono',monospace; font-size:12px;">
+            <span style="color:var(--accent-cyan)">${s.ball_speed_kmh} km/h</span>
+            <span style="color:var(--accent-green)">${s.technique_score}/100</span>
+            <span style="color:var(--text-dim)">${s.timestamp_sec}s</span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function filterShots() {
+      const cat = document.getElementById('shotCategoryFilter').value;
+      const pid = document.getElementById('shotPlayerFilter').value;
+
+      let filtered = currentShotsList;
+      if (cat !== 'ALL') {
+        filtered = filtered.filter(s => s.category === cat);
+      }
+      if (pid !== 'ALL') {
+        filtered = filtered.filter(s => String(s.shooter_player_idx) === pid);
+      }
+      renderShotsList(filtered);
+    }
+
+    // Render Points List
+    function renderPointsList(points) {
+      const container = document.getElementById('pointsListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      points.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'point-card';
+        div.onclick = () => seekToTime(p.start_time_sec, `Point #${p.point_number} (Game ${p.game_number})`, p.point_outcome);
+        
+        let outcomeClass = 'WINNER';
+        if (p.point_outcome.includes('ERROR')) outcomeClass = 'ERROR';
+        if (p.point_outcome.includes('FOUL')) outcomeClass = 'FOUL';
+
+        const chipsHtml = (p.shot_sequence || []).map(s => 
+          `<span class="p-chip">${s.category} (P${s.shooter_player_idx})</span>`
+        ).join(' ');
+
+        div.innerHTML = `
+          <div class="point-meta">
+            <span><strong>POINT #${p.point_number}</strong> • Game ${p.game_number} (${p.game_score})</span>
+            <span>${p.duration_sec}s • ${p.total_shots_in_rally} shots • Peak: ${p.peak_ball_speed_kmh} km/h</span>
+          </div>
+          <div class="point-outcome ${outcomeClass}">
+            🏆 ${p.winning_team} won point (${p.point_outcome})
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+            ${p.tactical_narrative}
+          </div>
+          <div class="sequence-chips">
+            ${chipsHtml}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Player Selection & Profile Dossier
+    function selectPlayer(pId) {
+      selectedPlayerId = pId;
+      document.querySelectorAll('.p-btn').forEach(b => {
+        if (b.textContent.includes(`P${pId}`)) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+
+      if (!matchData || !matchData.player_evaluations) return;
+      const pKey = `Player_${pId}`;
+      const profile = matchData.player_evaluations[pKey] || Object.values(matchData.player_evaluations)[pId];
+      if (!profile) return;
+
+      document.getElementById('sidePlayerTitle').textContent = profile.role;
+
+      // Update Side Radar
+      const radar = profile.radar_scores || {};
+      const sideRadarBox = document.getElementById('sideRadarBox');
+      sideRadarBox.innerHTML = `
+        <div class="stat-row">
+          <span>Overall Technique:</span>
+          <div class="stat-bar-outer"><div class="stat-bar-inner" style="width:${radar.overall || 80}%"></div></div>
+          <strong>${radar.overall || 80}/100</strong>
+        </div>
+        <div class="stat-row">
+          <span>Contact Timing:</span>
+          <div class="stat-bar-outer"><div class="stat-bar-inner" style="width:${radar.contact_timing || 85}%"></div></div>
+          <strong>${radar.contact_timing || 85}%</strong>
+        </div>
+        <div class="stat-row">
+          <span>Knee Flexion (Squat Depth):</span>
+          <div class="stat-bar-outer"><div class="stat-bar-inner ${radar.knee_flexion < 75 ? 'red' : ''}" style="width:${radar.knee_flexion || 75}%"></div></div>
+          <strong>${radar.knee_flexion || 75}%</strong>
+        </div>
+        <div class="stat-row">
+          <span>Overhead Extension:</span>
+          <div class="stat-bar-outer"><div class="stat-bar-inner" style="width:${radar.overhead_reach || 82}%"></div></div>
+          <strong>${radar.overhead_reach || 82}%</strong>
+        </div>
+        <div class="stat-row">
+          <span>Foul Discipline:</span>
+          <div class="stat-bar-outer"><div class="stat-bar-inner ${profile.fouls_committed_count > 15 ? 'red' : ''}" style="width:${radar.foul_discipline || 80}%"></div></div>
+          <strong>${radar.foul_discipline || 80}%</strong>
+        </div>
+      `;
+
+      // Update Side Drill
+      const drill = (profile.assigned_training_drills && profile.assigned_training_drills[0]) || {
+        name: "Wall-Rebound Early Prep Drill",
+        target: "Contact Timing",
+        objective: "Eliminate late contact off glass",
+        reps: "4 sets of 15 repetitions",
+        setup: "Stand 1.5m behind service line with rapid feeds"
+      };
+      document.getElementById('sideDrillCard').innerHTML = `
+        <div class="drill-title">🎯 Assigned Drill: ${drill.name}</div>
+        <div class="drill-item"><strong>Target:</strong> ${drill.target}</div>
+        <div class="drill-item"><strong>Objective:</strong> ${drill.objective}</div>
+        <div class="drill-item"><strong>Prescription:</strong> ${drill.reps}</div>
+        <div class="drill-item"><strong>Setup:</strong> ${drill.setup}</div>
+      `;
+
+      // Update Side Zone Stats
+      const z = profile.court_zone_distribution || { net_attack_pct: "20%", baseline_defense_pct: "50%", transition_zone_pct: "30%" };
+      document.getElementById('sideZoneStats').innerHTML = `
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>Net Attack Zone (Kitchen):</span> <strong style="color:var(--accent-green)">${z.net_attack_pct}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>Baseline & Glass Defense:</span> <strong style="color:var(--accent-cyan)">${z.baseline_defense_pct}</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>Transition Zone ("No-Man's Land"):</span> <strong style="color:var(--accent-orange)">${z.transition_zone_pct}</strong>
+        </div>
+        <div style="font-size:11.5px; color:var(--text-dim); margin-top:8px;">
+          Avg Knee Flexion: ${profile.biomechanics_averages.avg_knee_flexion_deg}° • Avg Exit Speed: ${profile.biomechanics_averages.avg_ball_exit_speed_kmh} km/h • Fouls: ${profile.fouls_committed_count}
+        </div>
+      `;
+
+      renderPlayerDossier(pId);
+    }
+
+    // Render Full Dossier inside Player Dev Tab
+    function renderPlayerDossier(pId) {
+      const container = document.getElementById('playerDossierContent');
+      if (!container || !matchData || !matchData.player_evaluations) return;
+
+      const pKey = `Player_${pId}`;
+      const profile = matchData.player_evaluations[pKey] || Object.values(matchData.player_evaluations)[pId];
+      if (!profile) return;
+
+      const flawsHtml = (profile.top_technical_flaws || []).map(f => `
+        <div style="background:rgba(255, 51, 102, 0.08); border-left:3px solid var(--accent-red); padding:8px 12px; border-radius:4px; margin-bottom:6px;">
+          <div style="font-weight:700; color:#ff6b8b; font-size:13px;">${f.flaw} (${f.frequency}x occurrences)</div>
+          <div style="font-size:12px; color:var(--text-muted);">${f.detail}</div>
+          <div style="font-size:12px; color:var(--accent-green); margin-top:4px;">🎯 <strong>Coaching Cue:</strong> ${f.coach_cue}</div>
+        </div>
+      `).join('');
+
+      const drillsHtml = (profile.assigned_training_drills || []).map(d => `
+        <div class="drill-card">
+          <div class="drill-title">🎾 ${d.name} (${d.target})</div>
+          <div class="drill-item"><strong>Objective:</strong> ${d.objective}</div>
+          <div class="drill-item"><strong>Setup:</strong> ${d.setup}</div>
+          <div class="drill-item"><strong>Prescription:</strong> <code>${d.reps}</code></div>
+          <div class="drill-item" style="color:var(--accent-green)"><strong>Coach Focus:</strong> ${d.coaching_key || "Maintain clean kinetic chain"}</div>
+        </div>
+      `).join('');
+
+      const curriculumHtml = (profile['4_week_development_curriculum'] || []).map(w => `
+        <div class="week-card">
+          <div class="week-title">${w.week}</div>
+          <div style="color:var(--text-muted); margin-bottom:2px;">Focus: ${w.focus}</div>
+          <div style="color:var(--accent-green)">Core Drill: <strong>${w.core_drill}</strong> (Target: ${w.success_metric})</div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div>
+            <h3 style="font-size:18px; color:var(--accent-green);">${profile.role}</h3>
+            <span style="font-size:12px; color:var(--text-muted);">${profile.team} • Total Match Shots: ${profile.total_shots} • Fouls: ${profile.fouls_committed_count}</span>
+          </div>
+          <div style="font-size:26px; font-weight:800; font-family:'JetBrains Mono',monospace; color:var(--accent-cyan);">
+            ${profile.coach_grade} <span style="font-size:13px; color:var(--text-muted); font-weight:400;">(${profile.overall_technique_score})</span>
+          </div>
+        </div>
+
+        <h4 style="font-size:14px; text-transform:uppercase; color:var(--accent-cyan); margin:14px 0 8px;">Identified Technical Flaws</h4>
+        ${flawsHtml || '<div style="color:var(--text-muted);">No major technical flaws detected.</div>'}
+
+        <h4 style="font-size:14px; text-transform:uppercase; color:var(--accent-cyan); margin:18px 0 8px;">Prescribed Certified Padel Drills</h4>
+        ${drillsHtml}
+
+        <h4 style="font-size:14px; text-transform:uppercase; color:var(--accent-cyan); margin:18px 0 8px;">Structured 4-Week Development Curriculum</h4>
+        ${curriculumHtml}
+      `;
+    }
+
+    // Telemetry Sync with Active Shot
+    function updateTelemetryWithShot(shot) {
+      if (!shot) return;
+      document.getElementById('teleSpeed').innerHTML = `${shot.ball_speed_kmh} <span class="t-unit">km/h</span>`;
+      document.getElementById('teleKnee').innerHTML = `${shot.metrics ? shot.metrics.knee_flexion_deg : 142}°`;
+      document.getElementById('teleContact').innerHTML = `${shot.metrics ? shot.metrics.aligned_contact_x_cm : '+20'} <span class="t-unit">cm</span>`;
+      document.getElementById('teleScore').innerHTML = `${shot.technique_score} <span class="t-unit">/100</span>`;
+
+      document.getElementById('coachLiveSpeech').textContent = `"${shot.coach_advice}"`;
+      if (shot.coach_critiques && shot.coach_critiques.length > 0) {
+        document.getElementById('coachLiveCue').innerHTML = `<span>🎯 <strong>Coaching Cue:</strong> ${shot.coach_critiques[0].coach_cue}</span>`;
+      } else {
+        document.getElementById('coachLiveCue').innerHTML = `<span>🎯 <strong>Coaching Cue:</strong> Maintain clean preparation and follow-through balance.</span>`;
+      }
+
+      document.getElementById('overlayShotCat').textContent = shot.category.toUpperCase();
+      document.getElementById('overlayShooter').textContent = `Shooter: ${shot.shooter_name}`;
+      document.getElementById('overlaySpeed').textContent = `Speed: ${shot.ball_speed_kmh} km/h`;
+    }
+
+    // Video Timeupdate Listener for Live Sync
+    function setupVideoListener() {
+      const vid = document.getElementById('padelVid');
+      if (!vid) return;
+
+      vid.ontimeupdate = () => {
+        const curSec = vid.currentTime;
+        const curFrame = Math.round(curSec * 30.0);
+        document.getElementById('liveFrameDisplay').textContent = `Frame: ${curFrame.toString().padStart(4, '0')} | ${curSec.toFixed(1)}s`;
+
+        // Check if matching any shot in current range
+        if (currentShotsList.length > 0) {
+          const matchShot = currentShotsList.find(s => Math.abs(s.timestamp_sec - curSec) < 0.6);
+          if (matchShot) {
+            updateTelemetryWithShot(matchShot);
+          }
+        }
+
+        // Check if matching any foul
+        if (currentFoulsList.length > 0) {
+          const matchFoul = currentFoulsList.find(f => Math.abs(f.timestamp_sec - curSec) < 0.6);
+          if (matchFoul) {
+            showFoulBanner(matchFoul);
+          }
+        }
+      };
+    }
+
+    // Fallback minimal dataset if no files loaded
+    function getFallbackData() {
+      return {
+        match_meta: { total_shots: 460, final_score: "Set 1: 1 - 4", total_games: 6 },
+        all_shots: [
+          { shot_id: 1, category: "Serve", shooter_name: "Player 0 (Near Left)", shooter_player_idx: 0, ball_speed_kmh: 88.5, technique_score: 92, timestamp_sec: 0.5, court_zone: "Baseline Defense", coach_advice: "Clean legal serve below waist height." },
+          { shot_id: 2, category: "Forehand", shooter_name: "Player 1 (Far Left)", shooter_player_idx: 1, ball_speed_kmh: 94.2, technique_score: 85, timestamp_sec: 2.1, court_zone: "Transition Zone", coach_advice: "Meet the ball 25cm in front of lead hip." },
+          { shot_id: 3, category: "Smash", shooter_name: "Player 2 (Far Right)", shooter_player_idx: 2, ball_speed_kmh: 118.0, technique_score: 95, timestamp_sec: 3.8, court_zone: "Kitchen Net Attack", coach_advice: "Full vertical apex reach at 12 o'clock." }
+        ],
+        all_fouls: [
+          { foul_type: "SERVICE_FOOT_FAULT", foul_name: "Foot Fault on Service (Falta de Pie)", rule: "FIP Rule 6 § a", offender_team: "Team 1", offender_idx: 0, timestamp_sec: 0.5, explanation: "Stepped on service line before contact", metric_detail: "Ankle at Y=16.82m (crossed 17.0m line)", coach_correction: "Anchor rear foot 30cm behind line" }
+        ],
+        player_evaluations: {
+          Player_0: { role: "Player 0 (Near Left)", team: "Team 1 (Near)", coach_grade: "B+", overall_technique_score: "80/100", total_shots: 98, fouls_committed_count: 16, biomechanics_averages: { avg_knee_flexion_deg: 137.9, avg_ball_exit_speed_kmh: 58.2 }, court_zone_distribution: { net_attack_pct: "20.4%", baseline_defense_pct: "38.8%", transition_zone_pct: "40.8%" }, radar_scores: { overall: 80, contact_timing: 88, knee_flexion: 82, overhead_reach: 85, foul_discipline: 82 } }
+        }
+      };
+    }
+
+    // Launch
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
